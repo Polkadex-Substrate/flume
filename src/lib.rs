@@ -33,17 +33,18 @@
 #[macro_use]
 extern crate sgx_tstd as std;
 
-#[cfg(feature = "select")]
-pub mod select;
+// #[cfg(feature = "select")]
+// pub mod select;
 #[cfg(feature = "async")]
 pub mod r#async;
 
 mod signal;
 
 // Reexports
-#[cfg(feature = "select")]
-pub use select::Selector;
+// #[cfg(feature = "select")]
+// pub use select::Selector;
 
+use std::untrusted::time::InstantEx;
 
 
 use std::{
@@ -54,6 +55,7 @@ use std::{
     thread,
     fmt,
 };
+
 
 use spin::{Mutex as Spinlock, MutexGuard as SpinlockGuard};
 use crate::signal::{Signal, SyncSignal};
@@ -336,6 +338,7 @@ impl<T> Hook<T, SyncSignal> {
     }
 }
 
+use std::thread::yield_now;
 #[inline]
 #[cfg(not(windows))]
 fn wait_lock<T>(lock: &Spinlock<T>) -> SpinlockGuard<T> {
@@ -345,7 +348,7 @@ fn wait_lock<T>(lock: &Spinlock<T>) -> SpinlockGuard<T> {
             if let Some(guard) = lock.try_lock() {
                 return guard;
             }
-            thread::yield_now();
+            yield_now();
         }
         // Sleep for at most ~1 ms
         thread::sleep(Duration::from_nanos(1 << i.min(20)));

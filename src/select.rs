@@ -2,7 +2,8 @@
 
 use crate::*;
 use std::{any::Any, marker::PhantomData};
-
+use std::untrusted::time::InstantEx;
+use std::prelude::v1::*;
 #[cfg(feature = "eventual-fairness")]
 use nanorand::Rng;
 
